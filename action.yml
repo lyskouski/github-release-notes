@@ -25,8 +25,8 @@ runs:
       id: prepare_release_notes
       shell: bash
       run: |
-        chmod +x gen-release.sh
-        RELEASE_NOTES=$(./gen-release.sh v${{ inputs.version }})
+        chmod +x $GITHUB_ACTION_PATH/gen-release.sh
+        RELEASE_NOTES=$($GITHUB_ACTION_PATH/gen-release.sh v${{ inputs.version }})
         echo "release_notes<<EOF" >> $GITHUB_OUTPUT
         echo "$RELEASE_NOTES" >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
