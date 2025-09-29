@@ -1,0 +1,14 @@
+name: "Release Notes Action"
+description: "Prepare release notes for the project"
+author: "Viachaslau Lyskouski"
+inputs:
+  name:
+    description: "The name to say hello to"
+    required: true
+    default: "World"
+runs:
+  using: "composite"
+  steps:
+    - name: Print greeting
+      run: echo "Hello ${{ inputs.name }}!"
+      shell: bash
