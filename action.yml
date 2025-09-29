@@ -1,14 +1,32 @@
 name: "Release Notes Action"
 description: "Prepare release notes for the project"
 author: "Viachaslau Lyskouski"
+
 inputs:
-  name:
-    description: "The name to say hello to"
+  version:
+    description: "The version of the release"
     required: true
-    default: "World"
+    default: "1.0.0"
+
+outputs:
+  release_notes:
+    description: "Release notes"
+    value: ${{ steps.prepare_release_notes.outputs.release_notes }}
+
 runs:
   using: "composite"
   steps:
-    - name: Print greeting
-      run: echo "Hello ${{ inputs.name }}!"
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Prepare Release Notes
+      id: prepare_release_notes
       shell: bash
+      run: |
+        chmod +x gen-release.sh
+        RELEASE_NOTES=$(./gen-release.sh v${{ inputs.version }})
+        echo "release_notes<<EOF" >> $GITHUB_OUTPUT
+        echo "$RELEASE_NOTES" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
