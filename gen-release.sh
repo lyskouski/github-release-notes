@@ -49,16 +49,12 @@ gen_release() {
         git_cmd+=("${till_tag}..HEAD")
     fi
     
-    # Get commit messages and filter them
+    # Get commit messages
     local comments=()
     while IFS= read -r line; do
-        # Skip merge and revert commits
-        if [[ "$line" != *"Merge pull"* && "$line" != *"Revert"* ]]; then
-            # Extract first sentence and remove quotes
-            local comment
-            comment=$(echo "$line" | cut -d'.' -f1 | sed 's/"//g')
-            comments+=("- $comment")
-        fi
+        local comment
+        comment=$(echo "$line" | cut -d'.' -f1 | sed 's/"//g')
+        comments+=("- $comment")
     done < <("${git_cmd[@]}")
 
     # Remove duplicates
