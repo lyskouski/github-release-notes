@@ -27,3 +27,5 @@ Usage:
 | DC | Documentation Change |
 | NF | New Functionality |
 | RF | Refactoring |
+
+**Sample:** [#1] [NF] Initialization. Adjust script
