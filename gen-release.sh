@@ -40,7 +40,8 @@ get_previous_tag() {
 
 gen_release() {
     local tag="$1"
-    local till_tag=$(get_previous_tag "$tag")
+    local till_tag
+    till_tag=$(get_previous_tag "$tag")
     
     # Prepare git log command
     local git_cmd=("git" "log" "--pretty=format:%s")
@@ -54,42 +55,52 @@ gen_release() {
         # Skip merge and revert commits
         if [[ "$line" != *"Merge pull"* && "$line" != *"Revert"* ]]; then
             # Extract first sentence and remove quotes
-            local comment=$(echo "$line" | cut -d'.' -f1 | sed 's/"//g')
+            local comment
+            comment=$(echo "$line" | cut -d'.' -f1 | sed 's/"//g')
             comments+=("- $comment")
         fi
     done < <("${git_cmd[@]}")
-    
+
     # Remove duplicates
-    local unique_comments=($(printf '%s\n' "${comments[@]}" | sort -u))
-    
-    # Add section headers
-    local all_comments=("${unique_comments[@]}")
-    all_comments+=(
-        "## [CI] Critical Issue(s)"
-        "## [NF] New Functionality"
-        "## [CR] Change Request(s)"
-        "## [BF] Bug Fix(es)"
-        "## [...] Other(s)"
+    local unique_comments=()
+    while IFS= read -r line; do
+        unique_comments+=("$line")
+    done < <(printf '%s\n' "${comments[@]}" | sort -u)
+
+    # Header definitions
+    declare -A headers=(
+        ["[AD]"]="## [AD] Architecture Description Records"
+        ["[CI]"]="## [CI] Critical Issue"
+        ["[NF]"]="## [NF] New Functionality"
+        ["[CR]"]="## [CR] Change Request"
+        ["[RF]"]="## [RF] Refactoring"
+        ["[BF]"]="## [BF] Bug Fix"
+        ["[DC]"]="## [DC] Documentation Change"
+        ["[BP]"]="## [BP] Build Process improvements (CI/CD Change)"
+        ["["]="## [...] Others"
     )
-    
-    # Sort comments according to the order
-    local output=""
-    local order=("[CI]" "[NF]" "[CR]" "[BF]" "[" "")
-    
-    for order_item in "${order[@]}"; do
-        for comment in "${all_comments[@]}"; do
-            if [[ "$comment" == *"$order_item"* ]]; then
-                # Headers come first within same category
-                if [[ "$comment" == "##"* ]]; then
-                    output="$comment"$'\n'"$output"
-                else
-                    output="$output$comment"$'\n'
-                fi
-            fi
-        done
+
+    # Define the desired output order of abbreviations
+    local order=("[AD]" "[CI]" "[NF]" "[CR]" "[RF]" "[BF]" "[DC]" "[BP]" "[")
+
+    # Group commits by abbreviation
+    declare -A grouped
+    for c in "${unique_comments[@]}"; do
+        if [[ $c =~ \[([A-Z]+)\] ]]; then
+            local abbr="[${BASH_REMATCH[1]}]"
+        else
+            abbr="["
+        fi
+        grouped["$abbr"]+="$c"$'\n'
     done
-    
-    echo "$output"
+
+    # Print only headers that have commits, with their commits
+    for abbr in "${order[@]}"; do
+        if [[ -n "${grouped[$abbr]}" ]]; then
+            echo "${headers[$abbr]}"
+            printf '%s' "${grouped[$abbr]}"
+        fi
+    done
 }
 
 # Main execution
