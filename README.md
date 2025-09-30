@@ -4,7 +4,7 @@ GitHub Release Notes preparation from commit messages
 Usage:
 ```yaml
 - name: Prepare Release Notes
-  uses: lyskouski/github-release-notes@v1
+  uses: lyskouski/github-release-notes@v2
   id: notes
   with:
     version: '0.0.6'
@@ -29,3 +29,7 @@ Usage:
 | RF | Refactoring |
 
 **Sample:** [#1] [NF] Initialization. Adjust script
+
+**Projects:** [Fingrom](https://github.com/lyskouski/app-finance), [Tlum](https://github.com/lyskouski/app-language)
+
+<img src="./index.png" alt="Tlum Logo" width="100%"/>

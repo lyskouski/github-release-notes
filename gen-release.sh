@@ -28,7 +28,10 @@ get_previous_tag() {
         local curr_minor=${curr[1]}
         local curr_patch=${curr[2]}
         
-        # Logic from Dart version
+        # Logic to cover different version bump scenarios
+        # [6.4.4 ...] 6.4.3 ... 6.4.0 ... 5.9.9 ...
+        # [6.5.0 ... 6.4.3 ...] 6.4.0 ... 5.9.9 ...
+        # [7.0.0 ... 6.4.3 ... 6.4.0 ...] 5.9.9 ...
         if [[ ($patch -eq $curr_patch && $minor -eq $curr_minor && $major -ne $curr_major) ||
               ($patch -eq 0 && $curr_patch -eq 0 && $minor -ne 0 && $minor -ne $curr_minor) ||
               ($patch -ne 0 && $patch -ne $curr_patch) ]]; then
