@@ -1,6 +1,9 @@
 name: "Release Notes from Commit Messages"
 description: "Generate release notes from commit messages"
 author: "Viachaslau Lyskouski"
+branding:
+  icon: "anchor"
+  color: "orange"
 
 inputs:
   version:
